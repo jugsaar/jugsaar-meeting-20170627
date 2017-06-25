@@ -1,0 +1,42 @@
+security:
+  basic:
+    enabled: false
+
+management:
+  security:
+    enabled: false
+
+
+server:
+  port: 10010
+
+---
+spring:
+  profiles: consul
+
+---
+spring:
+  profiles: instance1
+  cloud:
+    consul:
+      discovery:
+        tags: ['test','web']
+spring.profiles.include:
+  - test
+
+server:
+  port: 10021
+
+---
+spring:
+  profiles: instance2
+  cloud:
+    consul:
+      discovery:
+        tags: ['test','web']
+spring.profiles.include:
+  - test
+
+
+server:
+  port: 10022

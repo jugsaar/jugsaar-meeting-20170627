@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "repos": [
+    {
+      "name": "greeting-service",
+      "url": "/home/tom/dev/repos/gh/jugsaar/jugsaar-meeting-31/code/consul-service-registry-examples/consul-git-config/gitrepo/greeting-service",
+      "source_root": "config",
+      "mountpoint": "config",
+      "ignore_file_extension": true,
+      "branches": [
+        "dev",
+        "test"
+      ],
+      "expand_keys": true,
+      "hooks": [
+        {
+          "type": "polling",
+          "interval": "1"
+        }
+      ]
+    },
+    {
+      "name": "joke-service",
+      "url": "/home/tom/dev/repos/gh/jugsaar/jugsaar-meeting-31/code/consul-service-registry-examples/consul-git-config/gitrepo/joke-service",
+      "source_root": "config",
+      "mountpoint": "config",
+      "ignore_file_extension": true,
+      "branches": [
+        "dev",
+        "test"
+      ],
+      "expand_keys": true,
+      "hooks": [
+        {
+          "type": "polling",
+          "interval": "1"
+        }
+      ]
+    }
+  ]
+}

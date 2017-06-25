@@ -1,0 +1,79 @@
+security:
+  user:
+    password: test
+  basic:
+    enabled: false
+
+management:
+  security:
+    enabled: false
+
+
+greeting:
+# consul path config/greeting-service/[dev|test|prod]/greeting/salutation
+  salutation: 'Hello (config file)'
+  globalProperty: 'GlobalProperty (config file)'
+
+server:
+  port: 10000
+
+---
+spring:
+  profiles: consul
+
+---
+spring:
+  profiles: instance1
+  cloud:
+    consul:
+      discovery:
+# Registers the given instance with the tags "test" and "web"
+        tags: ['test','web']
+spring.profiles.include:
+  - test
+
+server:
+  port: 10001
+
+---
+spring:
+  profiles: instance2
+  cloud:
+    consul:
+      discovery:
+        tags: ['test','web']
+spring.profiles.include:
+  - test
+
+
+server:
+  port: 10002
+
+---
+spring:
+  profiles: instance3
+  cloud:
+    consul:
+      discovery:
+        tags: ['prod','web']
+
+spring.profiles.include:
+  - prod
+
+
+server:
+  port: 10003
+
+---
+spring:
+  profiles: instance4
+  cloud:
+    consul:
+      discovery:
+        tags: ['prod','web']
+
+spring.profiles.include:
+  - prod
+
+server:
+  port: 10004

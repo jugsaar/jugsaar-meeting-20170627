@@ -1,0 +1,43 @@
+events {
+  worker_connections 1024;
+}
+
+pid ./tmp/nginx.pid;
+
+# for demo...
+daemon off;
+
+http {
+
+  ##
+  # Logging Settings
+  ##
+  log_format timed_combined '$remote_addr - $remote_user [$time_local] ' '"$request" $status $body_bytes_sent ' '"$http_referer" "$http_user_agent" ' '$request_time';
+
+  access_log logs/access.log timed_combined;
+  error_log logs/error.log;
+
+# see https://www.nginx.com/resources/admin-guide/load-balancer/
+  upstream greeting_service {
+#    least_conn;
+# ...   max_fails=3 fail_timeout=60 weight=1
+
+    {{range service "test.greeting-service"}}server {{.Address}}:{{.Port}};
+    {{else}}server 127.0.0.1:65535; # force a 502{{end}}
+  }
+
+  server {
+    listen 9999;
+    server_name apps.tdlabs.local;
+
+    location /greeting-service {
+
+      rewrite /greeting-service(.*) /$1  break;
+
+      proxy_pass http://greeting_service;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+    }
+  }
+}

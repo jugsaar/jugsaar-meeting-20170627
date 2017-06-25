@@ -1,0 +1,33 @@
+spring:
+  cloud:
+    consul:
+      ribbon:
+        enabled: true
+      discovery:
+        register: false
+
+feign:
+  hystrix:
+    enabled: true
+
+
+bubu:
+  x-auth: foo
+
+---
+spring:
+  profiles: test
+  cloud:
+    consul:
+      discovery:
+        server-list-query-tags:
+          greeting-service: 'test'
+
+---
+spring:
+  profiles: prod
+  cloud:
+    consul:
+      discovery:
+        server-list-query-tags:
+          greeting-service: 'prod'

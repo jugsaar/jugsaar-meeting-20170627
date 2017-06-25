@@ -1,0 +1,16 @@
+spring:
+  application:
+      name: joke-service
+
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      config:
+        profile-separator: '/'
+        fail-fast: false
+      discovery:
+        fail-fast: false
+
+management:
+  add-application-context-header: false

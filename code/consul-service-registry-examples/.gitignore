@@ -1,0 +1,8 @@
+.git/
+logs/
+tmp/
+*.crt
+*.key
+
+target/
+.idea/
