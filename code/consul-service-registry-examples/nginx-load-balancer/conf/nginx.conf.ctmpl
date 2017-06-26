@@ -19,78 +19,76 @@ http {
 
 # see https://www.nginx.com/resources/admin-guide/load-balancer/
 
-# test-services
-  {{range services}}{{$serviceFilter := (printf "test.%s" .Name)}}{{$service := .Name}}
-  {{- if (.Tags | contains "web") -}}
-   upstream {{$service}}-test {
-     zone upstream-{{$service}} 64k;
-     least_conn;
-     {{- range service $serviceFilter }}
-     server {{.Address}}:{{.Port}} max_fails=3 fail_timeout=5 weight=1;
-     {{- else }}
-     server 127.0.0.1:65535; # force a 502 if no upstream server is available{{ end }}
-   }
-   {{end}}
-   {{end}}
 
-# prod-services
-  {{range services}}{{$serviceFilter := (printf "prod.%s" .Name)}}{{$service := .Name}}
-  {{- if (.Tags | contains "web") -}}
-   upstream {{$service}}-prod {
-     zone upstream-{{$service}} 64k;
-     least_conn;
-     {{- range service $serviceFilter }}
-     server {{.Address}}:{{.Port}} max_fails=3 fail_timeout=5 weight=1;
-     {{- else }}
-     server 127.0.0.1:65535; # force a 502 if no upstream server is available{{ end }}
-   }
-   {{end}}
-   {{end}}
+### test-services
+{{- range services}}{{$service := .Name}}{{$tag := "test"}}
+   {{- if (.Tags | contains "web") }}
+   upstream {{$service}}-{{$tag}} {
+      zone upstream-{{$service}} 64k;
+      least_conn;
+   {{- range service (printf "%s.%s" $tag $service) }}
+      server {{.Address}}:{{.Port}} max_fails=3 fail_timeout=5 weight=1;
+   {{- else }}
+      server 127.0.0.1:65535; # force a 502 if no upstream server is available{{ end }}
+   }{{end}}
+{{end}}
 
+### prod-services
+{{- range services}}{{$service := .Name}}{{$tag := "prod"}}
+   {{- if (.Tags | contains "web") }}
+   upstream {{$service}}-{{$tag}} {
+      zone upstream-{{$service}} 64k;
+      least_conn;
+   {{- range service (printf "%s.%s" $tag $service) }}
+      server {{.Address}}:{{.Port}} max_fails=3 fail_timeout=5 weight=1;
+   {{- else }}
+      server 127.0.0.1:65535; # force a 502 if no upstream server is available{{ end }}
+   }{{end}}
+{{end}}
 
+### test-server
   server {
     listen 9999;
     server_name test-apps.tdlabs.local;
 
-    {{range services}} {{$serviceFilter := (printf "test.%s" .Name)}} {{$service := .Name}}
-    {{- if and (.Tags | contains "web") -}}
-      location /a/{{$service}} {
+{{- range services}}{{$service := .Name}}{{$tag := "test"}}
+    {{- if and (.Tags | contains "web") }}
+    location /a/{{$service}} {
 
-        rewrite /a/{{$service}}(.*) /$1  break;
+      rewrite /a/{{$service}}(.*) /$1  break;
 
-        proxy_pass http://{{$service}}-test;
+      proxy_pass http://{{$service}}-{{$tag}};
 
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-      }
-    {{end}}
-    {{end}}
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+    } {{end}}
+{{end}}
   }
 
+### prod-server
 # see https://leehblue.com/add-self-signed-ssl-google-chrome-ubuntu-16-04/
   server {
     listen 443;
+    server_name apps.tdlabs.local;
+
     ssl on;
     ssl_certificate ./tdlabs.local.crt;
     ssl_certificate_key ./tdlabs.local.key;
 
-    server_name apps.tdlabs.local;
+{{- range services}}{{$service := .Name}}{{$tag := "prod"}}
+    {{- if and (.Tags | contains "web") }}
+    location /a/{{$service}} {
 
-    {{range services}} {{$serviceFilter := (printf "prod.%s" .Name)}} {{$service := .Name}}
-    {{- if and (.Tags | contains "web") -}}
-      location /a/{{$service}} {
+      rewrite /a/{{$service}}(.*) /$1  break;
 
-        rewrite /a/{{$service}}(.*) /$1  break;
+      proxy_pass http://{{$service}}-{{$tag}};
 
-        proxy_pass http://{{$service}}-prod;
-
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Real-IP $remote_addr;
-      }
-    {{end}}
-    {{end}}
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $host;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Real-IP $remote_addr;
+    } {{end}}
+{{end}}
   }
 }

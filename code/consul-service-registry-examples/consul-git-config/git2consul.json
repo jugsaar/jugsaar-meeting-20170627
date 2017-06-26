@@ -3,7 +3,7 @@
   "repos": [
     {
       "name": "greeting-service",
-      "url": "/home/tom/dev/repos/gh/jugsaar/jugsaar-meeting-31/code/consul-service-registry-examples/consul-git-config/gitrepo/greeting-service",
+      "url": "/home/tom/dev/repos/gh/jugsaar/jugsaar-meeting-31-gitrepo/repos/greeting-service",
       "source_root": "config",
       "mountpoint": "config",
       "ignore_file_extension": true,
@@ -21,7 +21,7 @@
     },
     {
       "name": "joke-service",
-      "url": "/home/tom/dev/repos/gh/jugsaar/jugsaar-meeting-31/code/consul-service-registry-examples/consul-git-config/gitrepo/joke-service",
+      "url": "/home/tom/dev/repos/gh/jugsaar/jugsaar-meeting-31-gitrepo/repos/joke-service",
       "source_root": "config",
       "mountpoint": "config",
       "ignore_file_extension": true,
